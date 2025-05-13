@@ -1,0 +1,11 @@
+/* src/App.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+.sansation-font {
+  font-family: 'Sansation', sans-serif;
+}
