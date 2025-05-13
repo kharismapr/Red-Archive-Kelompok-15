@@ -18,16 +18,9 @@ CREATE TABLE IF NOT EXISTS film (
     genre VARCHAR(255) NOT NULL,
     length INTERVAL NOT NULL,
     release_date DATE NOT NULL,
+    actor_name VARCHAR(255) NOT NULL,
+    director_name VARCHAR(255) NOT NULL,
     cover_picture VARCHAR(255) DEFAULT 'https://res.cloudinary.com/drm5dmz1y/image/upload/v1747057110/default_missing_gehecc.jpg'
-);
-
--- Table credits (actor & directors)
-CREATE TABLE IF NOT EXISTS credit (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    film_id UUID NOT NULL,
-    actor_name VARCHAR(255),
-    director_name VARCHAR(255),
-    FOREIGN KEY (film_id) REFERENCES film(id) ON DELETE CASCADE
 );
 
 -- Table review (user meninggalkan 1 review per film)
