@@ -28,7 +28,15 @@ export const ForumTable = () => (
             <th className="border-b border-red-400 px-6 py-3 text-left text-sm font-semibold text-red-900 tracking-wide">
             Forum
             </th>
-            {/* Other headers... */}
+            <th className="border-b border-red-400 px-6 py-3 text-left text-sm font-semibold text-red-900 tracking-wide">
+            Threads
+            </th>
+            <th className="border-b border-red-400 px-6 py-3 text-left text-sm font-semibold text-red-900 tracking-wide">
+            Posts
+            </th>
+            <th className="border-b border-red-400 px-6 py-3 text-left text-sm font-semibold text-red-900 tracking-wide">
+            Last Post
+            </th>
         </tr>
         </thead>
         <tbody>
