@@ -101,14 +101,14 @@ exports.updateUser = async(user) => {
 //     }
 exports.uploadProfile = async(user) => {
     try {
-        const image = req.file;
+        const image = user.file;
         const imageBase64 = "data:"+image.mimetype+";base64,"+image.buffer.toString('base64');
         const i = imageBase64.toString();
-        const file64 = parser.format(i, req.file.buffer);
+        const file64 = parser.format(i, user.file.buffer);
         const result = await cloudinary.v2.uploader.upload(file64.content);
         const res = await db.query(
             "UPDATE users SET profile_picture = ($1) WHERE id = ($2) RETURNING *;",
-            [result.url, user.id]
+            [result.url, user.body.id]
         );
         return res.rows[0];
     } catch (error) {

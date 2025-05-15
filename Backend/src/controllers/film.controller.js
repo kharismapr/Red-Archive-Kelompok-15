@@ -25,7 +25,7 @@ exports.getAll = async(req, res) => {
 //     }
 exports.getById = async(req, res) => {
     try {
-        const film = await filmRepository.getById(req.body);
+        const film = await filmRepository.getById(req.body.film_id);
         if(film) {
             r.resp(res, true, 200, "Film retrieved successfully", film);
         } else {
@@ -72,7 +72,7 @@ exports.insertFilm = async(req, res) => {
 // Edits a film in the database
 // form-data req.body
 //     {
-//         "film_id": {TEXT},
+//         "id": {TEXT},
 //         "image": {FILE} <OPTIONAL>,
 //         "name": {TEXT},
 //         "genre": {TEXT},
@@ -83,20 +83,15 @@ exports.insertFilm = async(req, res) => {
 //     }
 //       - Format is the same as insertFilm()
 exports.updateFilm = async(req, res) => {
-    let film;
     try {
-        if(!req.file) {
-            film = await filmRepository.updateFilm(req.body);
-        } else {
-            film = await filmRepository.updateFilm(req);
-        }
+        const film = await filmRepository.updateFilm(req);
         if(film) {
-            r.resp(res, true, 200, "Film inserted successfully", film);
+            r.resp(res, true, 200, "Film edited successfully", film);
         } else {
             r.resp(res, false, 404, "Film not found", null)
         }
     } catch (error) {
-        r.resp(res, false, 500, "Error inserting film", error);
+        r.resp(res, false, 500, "Error editing film", error);
     }
 }
 
@@ -108,11 +103,11 @@ exports.updateFilm = async(req, res) => {
 //     }
 exports.deleteFilm = async(req, res) => {
     try {
-        const film = await filmRepository.deleteFilm(req);
+        const film = await filmRepository.deleteFilm(req.body.id);
         if(film) {
-            r.resp(res, true, 200, "Film inserted successfully", film);
+            r.resp(res, true, 200, "Film deleted successfully", film);
         }
     } catch (error) {
-        r.resp(res, false, 500, "Error inserting film", error);
+        r.resp(res, false, 500, "Error deleting film", error);
     }
 }
