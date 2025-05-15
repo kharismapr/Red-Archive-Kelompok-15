@@ -1,12 +1,13 @@
-// src/components/Footer/QuickLinks.jsx
+import { Link } from 'react-router-dom';
+
 export const QuickLinks = () => (
     <div>
         <h4 className="font-semibold mb-3 select-text">Quick Links</h4>
         <ul className="space-y-1 text-white text-base select-text">
-        <li><a className="hover:underline" href="#">Home</a></li>
-        <li><a className="hover:underline" href="#">About Us</a></li>
-        <li><a className="hover:underline" href="#">Forum</a></li>
-        <li><a className="hover:underline" href="#">Films</a></li>
+            <li><Link className="hover:underline" to="/">Home</Link></li>
+            <li><Link className="hover:underline" to="/about">About Us</Link></li>
+            <li><Link className="hover:underline" to="/forum">Forum</Link></li>
+            <li><Link className="hover:underline" to="/film">Films</Link></li>
         </ul>
     </div>
 );

@@ -1,5 +1,5 @@
 import React from "react";
-import { Logo } from "../Logo";  // Import Logo component
+import { Logo } from "../Logo";  
 import { QuickLinks } from "./QuickLinks";
 import { Contacts } from "./Contacts";
 
