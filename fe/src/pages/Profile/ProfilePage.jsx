@@ -4,7 +4,7 @@ import { Footer } from '../../components/Footer/Footer';
 import { ProfileSidebar } from './ProfileSidebar/ProfileSidebar';
 import { FilmGrid } from './FilmGrid/FilmGrid';
 
-const ProfilePage = () => {
+export const ProfilePage = () => {
     return (
         <div className="bg-[#b73c44] text-white min-h-screen flex flex-col">
         <Header />

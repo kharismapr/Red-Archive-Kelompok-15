@@ -7,10 +7,12 @@ import { ForumSidebar } from './ForumSidebar';
 export const ForumPage = () => (
     <div className="bg-[#bb3a44] min-h-screen flex flex-col">
         <Header />
-        <main className="flex-grow flex max-w-7xl mx-auto w-full px-6 pb-8 space-x-8">
+        <main className="flex-grow flex max-w-7xl mx-auto w-full px-6 py-8 space-x-8">
         <ForumMain />
         <ForumSidebar />
         </main>
         <Footer />
     </div>
 );
+
+export default ForumPage;

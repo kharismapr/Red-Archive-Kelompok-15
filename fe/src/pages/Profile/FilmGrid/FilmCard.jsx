@@ -1,7 +1,7 @@
 // src/pages/Profile/FilmGrid/FilmCard.jsx
 export const FilmCard = ({ imageUrl, name, rating }) => (
-    <div className="bg-[#9a2f36] rounded-lg p-2 relative max-w-xs mx-auto">
-        <div className="absolute -top-3 -left-3 text-yellow-300 text-2xl select-none" title="Favorite star">
+    <div className="bg-[#7B191F] rounded-lg p-5 relative max-w-xs mx-auto">
+        <div className="absolute -top-3 -left-3 text-yellow-300 text-3xl select-none" title="Favorite star">
         <i className="fas fa-star"></i>
         </div>
         <img 

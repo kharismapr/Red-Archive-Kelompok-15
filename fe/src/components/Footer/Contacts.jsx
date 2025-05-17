@@ -13,7 +13,7 @@ export const Contacts = () => (
         </li>
         <li className="flex items-center space-x-3">
             <i className="fab fa-instagram text-xl"></i>
-            <span>@</span>
+            <span>@maxwell_zefanya</span>
         </li>
         </ul>
     </div>
