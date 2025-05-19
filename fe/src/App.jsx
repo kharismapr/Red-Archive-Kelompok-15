@@ -11,6 +11,7 @@ import Film from './pages/Film.jsx';
 import FilmDetail from './pages/FilmDetail.jsx';
 import FilmReview from './pages/FilmReview.jsx';
 import { ThreadList } from './pages/Forum/ThreadList/ThreadList';
+import { ThreadPage } from './pages/Thread/ThreadPage'; // Add this import
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -100,6 +101,14 @@ export default function App() {
             <ThreadList />
           </PageTransition>
         } />
+        
+        {/* Add this new route */}
+        <Route path="/thread/:threadId" element={
+          <PageTransition>
+            <ThreadPage />
+          </PageTransition>
+        } />
+        
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </Router>
