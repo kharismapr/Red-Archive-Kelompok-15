@@ -10,6 +10,7 @@ import { ForumPage } from './pages/Forum/ForumPage.jsx';
 import Film from './pages/Film.jsx';
 import FilmDetail from './pages/FilmDetail.jsx';
 import FilmReview from './pages/FilmReview.jsx';
+import { ThreadList } from './pages/Forum/ThreadList/ThreadList';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -44,54 +45,60 @@ const PageTransition = ({ children }) => {
 
 export default function App() {
   return (
-    
     <Router>
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<PageTransition><Registration /></PageTransition>} />
         <Route path="/register" element={<PageTransition><Registration /></PageTransition>} />
         <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
+        
+        {/* Temporarily disabled protected routes for development */}
         <Route path="/home" element={
-          <ProtectedRoute>
+          // <ProtectedRoute>
             <PageTransition>
               <Home />
             </PageTransition>
-          </ProtectedRoute>
+          // </ProtectedRoute>
         } />
         <Route path="/profile" element={
-          <ProtectedRoute>
+          // <ProtectedRoute>
             <PageTransition>
               <ProfilePage />
             </PageTransition>
-          </ProtectedRoute>
+          // </ProtectedRoute>
         } />
         <Route path="/forum" element={
-          <ProtectedRoute>
+          // <ProtectedRoute>
             <PageTransition>
               <ForumPage />
             </PageTransition>
-          </ProtectedRoute>
+          // </ProtectedRoute>
         } />
         <Route path="/film" element={
-          <ProtectedRoute>
+          // <ProtectedRoute>
             <PageTransition>
               <Film />
             </PageTransition>
-          </ProtectedRoute>
+          // </ProtectedRoute>
         } />
         <Route path="/film/:filmSlug" element={
-          <ProtectedRoute>
+          // <ProtectedRoute>
             <PageTransition>
               <FilmDetail />
             </PageTransition>
-          </ProtectedRoute>
+          // </ProtectedRoute>
         } />
         <Route path="/review/:filmSlug" element={
-          <ProtectedRoute>
+          // <ProtectedRoute>
             <PageTransition>
               <FilmReview />
             </PageTransition>
-          </ProtectedRoute>
+          // </ProtectedRoute>
+        } />
+        <Route path="/forum/:forumId" element={
+          <PageTransition>
+            <ThreadList />
+          </PageTransition>
         } />
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
