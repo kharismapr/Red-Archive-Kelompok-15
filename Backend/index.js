@@ -22,6 +22,7 @@ const sql = neon(process.env.DATABASE_URL);
 app.use(express.json());
 app.use('/user', require('./src/routes/user.routes'));
 app.use('/film', require('./src/routes/film.routes'));
+app.use('/review', require('./src/routes/review.routes'));
 
 
 const server = app.listen(PORT, () => {
