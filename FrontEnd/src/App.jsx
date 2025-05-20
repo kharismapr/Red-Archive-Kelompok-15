@@ -57,46 +57,46 @@ export default function App() {
         
         {/* Temporarily disabled protected routes for development */}
         <Route path="/home" element={
-          // <ProtectedRoute>
+          <ProtectedRoute>
             <PageTransition>
               <Home />
             </PageTransition>
-          // </ProtectedRoute>
+          </ProtectedRoute>
         } />
         <Route path="/profile" element={
-          // <ProtectedRoute>
+          <ProtectedRoute>
             <PageTransition>
               <ProfilePage />
             </PageTransition>
-          // </ProtectedRoute>
+          </ProtectedRoute>
         } />
         <Route path="/forum" element={
-          // <ProtectedRoute>
+          <ProtectedRoute>
             <PageTransition>
               <ForumPage />
             </PageTransition>
-          // </ProtectedRoute>
+          </ProtectedRoute>
         } />
         <Route path="/film" element={
-          // <ProtectedRoute>
+          <ProtectedRoute>
             <PageTransition>
               <Film />
             </PageTransition>
-          // </ProtectedRoute>
+          </ProtectedRoute>
         } />
         <Route path="/film/:filmSlug" element={
-          // <ProtectedRoute>
+          <ProtectedRoute>
             <PageTransition>
               <FilmDetail />
             </PageTransition>
-          // </ProtectedRoute>
+          </ProtectedRoute>
         } />
         <Route path="/review/:filmSlug" element={
-          // <ProtectedRoute>
+          <ProtectedRoute>
             <PageTransition>
               <FilmReview />
             </PageTransition>
-          // </ProtectedRoute>
+          </ProtectedRoute>
         } />
         <Route path="/forum/:forumId" element={
           <PageTransition>

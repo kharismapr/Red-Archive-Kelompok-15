@@ -39,7 +39,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl">
           <div className="flex justify-between items-center mb-6 px-4">
             <h2 className="text-2xl font-bold text-white">All Films You Might Like</h2>
-            <Link to="/films" className="text-white hover:text-gray-200 font-semibold">
+            <Link to="/film" className="text-white hover:text-gray-200 font-semibold">
               View More
             </Link>
           </div>
