@@ -12,15 +12,14 @@ const parser = new DatauriParser();
 
 
 
-// Retrieve a film based on ID
+// Retrieve all films
 // raw req.body
 //     {
-//         "film_id":
 //     }
 exports.getAll = async() => {
     try {
         const res = await db.query(
-            "SELECT * FROM film;"
+            "SELECT id,name,genre,(total_rating::real/(reviews::real-1)) AS rating,length,release_date,actor_name,director_name,cover_picture FROM film;"
         );
         return res.rows;
     } catch (error) {
@@ -38,7 +37,7 @@ exports.getAll = async() => {
 exports.getById = async(film_id) => {
     try {
         const res = await db.query(
-            "SELECT * FROM film WHERE id = ($1);",
+            "SELECT id,name,genre,(total_rating::real/(reviews::real-1)) AS rating,length,release_date,actor_name,director_name,cover_picture FROM film WHERE id = ($1);",
             [film_id]
         );
         return res.rows[0];
