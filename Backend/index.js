@@ -14,11 +14,6 @@ cloudinary.config({
     api_secret: process.env.API_SECRET, 
 });
 
-// NeonDB
-const http = require("http");
-const { neon } = require("@neondatabase/serverless");
-const sql = neon(process.env.DATABASE_URL);
-
 app.use(express.json());
 app.use('/user', require('./src/routes/user.routes'));
 app.use('/film', require('./src/routes/film.routes'));
@@ -28,6 +23,11 @@ app.use('/forum', require('./src/routes/forum.routes'));
 app.use('/thread', require('./src/routes/thread.routes'));
 app.use('/post', require('./src/routes/post.routes'));
 
+
+// NeonDB
+const http = require("http");
+const { neon } = require("@neondatabase/serverless");
+const sql = neon(process.env.DATABASE_URL);
 
 const server = app.listen(PORT, () => {
     console.log('Run Port', PORT);
