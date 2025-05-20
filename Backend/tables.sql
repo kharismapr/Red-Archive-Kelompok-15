@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS film (
     description VARCHAR(255) NOT NULL,
     total_rating INT DEFAULT 0,
     reviews INT DEFAULT 1,
-    length INTERVAL NOT NULL,
+    duration INTERVAL NOT NULL,
     release_date DATE NOT NULL,
     actor_name VARCHAR(255) NOT NULL,
     director_name VARCHAR(255) NOT NULL,
