@@ -19,7 +19,7 @@ const parser = new DatauriParser();
 exports.getAll = async() => {
     try {
         const res = await db.query(
-            "SELECT id,name,genre,(total_rating::real/(reviews::real-1)) AS rating,length,release_date,actor_name,director_name,cover_picture FROM film;"
+            "SELECT id,name,genre,(total_rating::real/(reviews::real)) AS rating,length,release_date,actor_name,director_name,cover_picture FROM film;"
         );
         return res.rows;
     } catch (error) {
