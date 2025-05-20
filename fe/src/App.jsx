@@ -14,6 +14,7 @@ import { ThreadList } from './pages/Forum/ThreadList/ThreadList';
 import { ThreadPage } from './pages/Thread/ThreadPage'; // Add this import
 import ArchivePage from './pages/Archive/ArchivePage';
 
+
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const user = localStorage.getItem('user');
@@ -115,7 +116,6 @@ export default function App() {
             <ArchivePage />
           </PageTransition>
         } />
-        
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </Router>
