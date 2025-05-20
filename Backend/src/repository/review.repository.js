@@ -73,9 +73,16 @@ exports.getSpecific = async(film_id, user_id) => {
 //           if empty pass ""
 exports.createReview = async(review) => {
     try {
+        // Return the review
         const res = await db.query(
             "INSERT INTO review (film_id, user_id, rating, details) VALUES ($1, $2, $3, $4) RETURNING *;",
             [review.film_id, review.user_id, review.rating, review.details]
+        );
+
+        // Update the movie
+        const upd = await db.query(
+            "UPDATE film SET total_rating = total_rating + ($1), reviews = reviews + 1 WHERE id = ($2) RETURNING *;",
+            [review.rating, review.film_id]
         );
         return res.rows[0];
     } catch (error) {
@@ -93,7 +100,7 @@ exports.createReview = async(review) => {
 //         "rating":,
 //         "details":
 //     }
-exports.updateFilm = async(review) => {
+exports.updateReview = async(review) => {
     let res;
     try {
         res = await db.query(
@@ -113,7 +120,7 @@ exports.updateFilm = async(review) => {
 //     {
 //         "id":
 //     }
-exports.deleteUser = async(id) => {
+exports.deleteReview = async(id) => {
     try {
         const res = await db.query(
             "DELETE FROM review WHERE id = ($1) RETURNING *;",

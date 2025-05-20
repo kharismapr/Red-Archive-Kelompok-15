@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS film (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
     genre VARCHAR(255) NOT NULL,
+    total_rating INT DEFAULT 0,
+    reviews INT DEFAULT 1,
     length INTERVAL NOT NULL,
     release_date DATE NOT NULL,
     actor_name VARCHAR(255) NOT NULL,
@@ -52,13 +54,14 @@ CREATE TABLE IF NOT EXISTS thread (
     film_id UUID,
     original_poster_id UUID NOT NULL,
     name VARCHAR(255) NOT NULL,
+    thread_info VARCHAR(255) DEFAULT '',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (film_id) REFERENCES film(id) ON DELETE CASCADE,
     FOREIGN KEY (original_poster_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Table thread discussions (isi dari thread sendiri)
-CREATE TABLE IF NOT EXISTS thread_content (
+CREATE TABLE IF NOT EXISTS post (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     thread_id UUID NOT NULL,
     user_id UUID NOT NULL,
@@ -67,4 +70,16 @@ CREATE TABLE IF NOT EXISTS thread_content (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (thread_id) REFERENCES thread(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Table forum (tempat thread yang satu topik dengan forum)
+CREATE TABLE IF NOT EXISTS forum (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    thread_count INT DEFAULT 0,
+    post_count INT DEFAULT 0,
+    last_post_id UUID DEFAULT NULL, 
+    cover_picture VARCHAR(255) DEFAULT 'https://res.cloudinary.com/drm5dmz1y/image/upload/v1747057110/default_missing_gehecc.jpg',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (last_post_id) REFERENCES post(id) ON DELETE CASCADE
 );

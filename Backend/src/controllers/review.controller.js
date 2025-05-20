@@ -92,9 +92,9 @@ exports.deleteReview = async(req, res) => {
     try {
         const review = await reviewRepository.deleteReview(req.body.review_id);
         if(review) {
-            r.resp(res, true, 200, "Review inserted successfully", review);
+            r.resp(res, true, 200, "Review deleted successfully", review);
         }
     } catch (error) {
-        r.resp(res, false, 500, "Error inserting review", error);
+        r.resp(res, false, 500, "Error deleting review", error);
     }
 }
