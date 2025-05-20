@@ -4,7 +4,7 @@ export const Logo = () => (
         <img 
         alt="Folder icon representing RedArchive logo" 
         className="w-10 h-8" 
-        src="/Logo.svg" 
+        src="https://hackmd.io/_uploads/SkqXnuHWex.svg" 
         />
         <span className="font-extrabold italic text-white text-xl select-none sansation-font">
         RedArchive
