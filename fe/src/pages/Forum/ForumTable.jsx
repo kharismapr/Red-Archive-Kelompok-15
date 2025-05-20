@@ -1,5 +1,10 @@
 // src/pages/Forum/ForumTable.jsx
 import { ForumTableRow } from './ForumTableRow';
+import axios from "axios";
+
+
+// const forum = await axios.get("https://red-archive-kelompok-15.vercel.app/forum/getAll");
+// console.log(forum);
 
 const forumData = [
     {

@@ -1,9 +1,41 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Logo from '../assets/Logo.svg';
 import Icon from '../assets/Popfilm.svg';
 
 export default function Login() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const navigate = useNavigate();
+    
+    const LoginHandler = async() => {
+
+        try{
+            if(password.length === 0 || email.length === 0){
+                navigate("/login");
+            }
+            else{
+                const response = await axios.post("https://red-archive-kelompok-15.vercel.app/user/login", {
+                    email: email,
+                    password: password
+                },null);
+                if(response.status === 200){
+                    localStorage.setItem('id', response.data.payload.id)
+                    localStorage.setItem('user', response.data.payload.name)
+                    localStorage.setItem('email', response.data.payload.email)
+                    localStorage.setItem('profile_picture', response.data.payload.profile_picture)
+                    localStorage.setItem('join_date', response.data.payload.created_at)
+                    localStorage.setItem('description', response.data.payload.description)
+                    navigate('/home')
+                } else {
+                    throw new Error("Login failed")
+                }
+            }
+        }catch (error){
+            console.error(error);
+        }
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col lg:flex-row">
@@ -24,6 +56,8 @@ export default function Login() {
                     <input
                         type="email"
                         name="email"
+                        value={email} 
+                        onChange={(e) => setEmail(e.target.value)} 
                         placeholder="Enter your email"
                         className="w-full p-3 sm:p-4 rounded-lg border-2 border-[#BE3C44] focus:outline-none focus:border-[#BE3C44] focus:ring focus:ring-[#BE3C44]/20 text-sm sm:text-base"
                         required
@@ -31,6 +65,8 @@ export default function Login() {
                     <input
                         type="password"
                         name="password"
+                            value={password} 
+                            onChange={(e) => setPassword(e.target.value)} 
                         placeholder="Enter your password"
                         className="w-full p-3 sm:p-4 rounded-lg border-2 border-[#BE3C44] focus:outline-none focus:border-[#BE3C44] focus:ring focus:ring-[#BE3C44]/20 text-sm sm:text-base"
                         required
@@ -38,7 +74,7 @@ export default function Login() {
                     <button
                         type="button"
                         className="w-full py-3 sm:py-4 bg-[#BE3C44] text-white rounded-lg font-semibold hover:bg-opacity-90 transition-all text-sm sm:text-base"
-                        onClick={() => navigate('/home')}
+                        onClick={LoginHandler}
                     >
                         Login
                     </button>

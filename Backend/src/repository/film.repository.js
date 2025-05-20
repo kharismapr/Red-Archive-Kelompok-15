@@ -99,7 +99,7 @@ exports.insertFilm = async(film) => {
 exports.updateFilm = async(film) => {
     let res;
     try {
-        if(!req.file) {
+        if(!film.file) {
             res = await db.query(
                 "UPDATE film SET name = ($1), genre = ($2), duration = ($3), release_date = ($4), actor_name = ($5), director_name = ($6) WHERE id = ($7) RETURNING *;",
                 [film.body.name, film.body.genre, film.body.duration, film.body.release_date, film.body.actor_name, film.body.director_name, film.body.id]

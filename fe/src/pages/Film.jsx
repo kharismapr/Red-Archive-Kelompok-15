@@ -19,23 +19,38 @@ export default function Film() {
     
     // Filter film berdasarkan genre yang dipilih atau query pencarian
     useEffect(() => {
-        if (searchQuery) {
-        // Filter film berdasarkan query pencarian
-        const searchResults = films.filter(film => 
-            film.title.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        setDisplayedFilms(searchResults);
-        // Reset genre filter saat pencarian
-        setSelectedGenre('All');
-        } else if (selectedGenre === 'All') {
-        setDisplayedFilms(films);
-        } else {
-        const filtered = films.filter(film => 
-            film.genres.includes(selectedGenre)
-        );
-        setDisplayedFilms(filtered);
-        }
     }, [selectedGenre, searchQuery]);
+
+    // Mencari film berdasarkan slug dan filter reviews
+    useEffect(() => {
+      handleFilmDetail();
+    }, [filmSlug]);
+
+    
+    const handleFilmDetail = async () => {
+      try {
+        const response = await axios.get("https://red-archive-kelompok-15.vercel.app/film/getAll");
+        console.log(response.data.payload);
+
+        if (searchQuery) {
+          // Filter film berdasarkan query pencarian
+          const searchResults = films.filter(film => 
+              film.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          setDisplayedFilms(searchResults);
+          // Reset genre filter saat pencarian
+          setSelectedGenre('All');
+        } else if (selectedGenre === 'All') {
+          setDisplayedFilms(films);
+        } else {
+          const filtered = films.filter(film => film.genres.includes(selectedGenre)
+        );
+          setDisplayedFilms(filtered);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
     return (
     <div className="min-h-screen flex flex-col bg-[#BE3C44]">

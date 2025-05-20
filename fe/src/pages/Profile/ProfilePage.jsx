@@ -11,7 +11,7 @@ export const ProfilePage = () => {
         <main className="flex flex-col md:flex-row px-6 py-8 flex-grow max-w-7xl mx-auto w-full gap-8">
             <ProfileSidebar />
             <section className="flex-1">
-            <h3 className="font-semibold text-lg mb-4 select-text">biography</h3>
+            <h3 className="font-semibold text-lg mb-4 select-text">{localStorage.getItem('description')}</h3>
             <h4 className="font-semibold text-white text-base mb-4 select-text">Fav Films</h4>
             <FilmGrid />
             </section>
