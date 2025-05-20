@@ -2,6 +2,10 @@ const filmController = require('../controllers/film.controller');
 const express = require('express');
 const router = express.Router();
 
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 router.get('/getAll', filmController.getAll);
 router.get('/getById', filmController.getById);
 router.post('/insert', upload.single('image'), filmController.insertFilm);

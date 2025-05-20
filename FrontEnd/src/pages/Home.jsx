@@ -1,4 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { Header } from '../components/Header/Header.jsx';
 import { Footer } from '../components/Footer/Footer.jsx';
 import Homepic from '../assets/homepic.svg';
@@ -9,6 +11,24 @@ import { threads } from './threadData.jsx';
 import ThreadCard from '../components/ThreadCard.jsx';
 
 export default function Home() {
+  const [film, setFilm] = useState([{}]);
+
+  useEffect(() => {
+    handleHomePage();
+  },[]);
+
+  
+  const handleHomePage = async () => {
+    try {
+      const response = await axios.get("https://red-archive-kelompok-15.vercel.app/film/getAll")
+      setFilm(response.data.payload.map((data) => data));
+      console.log("RESPMAP: ", response.data.payload.map((data) => data));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  
+
   return (
     <div className="min-h-screen bg-[#BE3C44]">
       <Header />

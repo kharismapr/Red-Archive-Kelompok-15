@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import axios from "axios";
 import { Header } from '../components/Header/Header.jsx';
 import { Footer } from '../components/Footer/Footer.jsx';
 import films from './filmsData.jsx';
@@ -9,20 +10,38 @@ export default function FilmDetail() {
   const { filmSlug } = useParams();
   const [film, setFilm] = useState(null);
   const [filmReviews, setFilmReviews] = useState([]); // Renamed untuk kejelasan
-  
+
   // Mencari film berdasarkan slug dan filter reviews
   useEffect(() => {
-    const foundFilm = films.find(f => 
-      f.title.toLowerCase().replace(/\s+/g, '-') === filmSlug
-    );
-    
-    if (foundFilm) {
-      setFilm(foundFilm);
-      
-      // Filter reviews untuk film ini saja
-      setFilmReviews(reviews.filter(review => review.film_id === foundFilm.id));
-    }
+    handleFilmDetail();
   }, [filmSlug]);
+
+  
+  const handleFilmDetail = async () => {
+    try {
+      const response = await axios.get("https://red-archive-kelompok-15.vercel.app/film/getAll");
+      console.log(response.data.payload);
+      
+      const foundFilm = response.data.payload.find(f => 
+        f.name.toLowerCase().replace(/\s+/g, '-') === filmSlug
+      );
+      let {hours, minutes, seconds} = foundFilm.duration;
+      if(hours == undefined) hours = 0;
+      if(minutes == undefined) minutes = 0;
+      if(seconds == undefined) seconds = 0;
+      minutes += hours*60;
+      foundFilm.duration = `${minutes} Minutes`; 
+      console.log(foundFilm.duration);
+      if (foundFilm) {
+        setFilm(foundFilm);
+        
+        // Filter reviews untuk film ini saja
+        // setFilmReviews(reviews.filter(review => review.film_id === foundFilm.id));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   // Jika film tidak ditemukan
   if (!film) {
@@ -42,10 +61,10 @@ export default function FilmDetail() {
     );
   }
 
-  // Menghitung rata-rata skor dari reviews
-  const averageScore = filmReviews.length > 0 
-    ? (filmReviews.reduce((sum, review) => sum + review.score, 0) / filmReviews.length).toFixed(1)
-    : film.score; // Gunakan skor film jika tidak ada review
+  // // Menghitung rata-rata skor dari reviews
+  // const averageScore = filmReviews.length > 0 
+  //   ? (filmReviews.reduce((sum, review) => sum + review.score, 0) / filmReviews.length).toFixed(1)
+  //   : film.score; // Gunakan skor film jika tidak ada review
 
   return (
     <div className="min-h-screen flex flex-col bg-[#BE3C44]">
@@ -54,7 +73,7 @@ export default function FilmDetail() {
       <main className="flex-grow py-8 px-4">
         <div className="mx-auto max-w-7xl">
           {/* Film Title */}
-          <h1 className="text-3xl font-bold text-white mb-6 px-4">{film.title}</h1>
+          <h1 className="text-3xl font-bold text-white mb-6 px-4">{film.name}</h1>
           
           {/* Horizontal line */}
           <div className="border-t border-white/30 mb-6 mx-4"></div>
@@ -66,14 +85,14 @@ export default function FilmDetail() {
               <div className="bg-[#7B191F] rounded-lg shadow-md overflow-hidden">
                 <div className="p-3">
                   <img
-                    src={film.image}
-                    alt={film.title}
+                    src={film.cover_picture}
+                    alt={film.name}
                     className="w-full object-cover rounded"
                   />
                 </div>
                 <div className="px-4 pb-4 text-white text-center">
-                  <h3 className="text-xl font-bold mb-1">{film.title}</h3>
-                  <p className="text-sm text-gray-300">{film.genres.join(', ')}</p>
+                  <h3 className="text-xl font-bold mb-1">{film.name}</h3>
+                  <p className="text-sm text-gray-300">{film.genre}</p>
                 </div>
               </div>
               {/* <p className="text-white mt-2 text-sm">ID: {film.id}</p> */}
@@ -83,16 +102,16 @@ export default function FilmDetail() {
             <div className="md:w-2/3 lg:w-3/4">
               <div className="bg-[#7B191F] rounded-lg shadow-md p-6 text-white">
                 <h2 className="text-2xl font-bold mb-4">Synopsis</h2>
-                <p className="mb-6">{film.synopsis}</p>
+                <p className="mb-6">{film.description}</p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   <div>
                     <h3 className="font-bold text-lg mb-2">Directors</h3>
-                    <p>{film.directors.join(', ')}</p>
+                    <p>{film.director_name}</p>
                   </div>
                   <div>
                     <h3 className="font-bold text-lg mb-2">Actors</h3>
-                    <p>{film.actors.join(', ')}</p>
+                    <p>{film.actor_name}</p>
                   </div>
                   <div>
                     <h3 className="font-bold text-lg mb-2">Release Date</h3>
@@ -100,13 +119,13 @@ export default function FilmDetail() {
                   </div>
                   <div>
                     <h3 className="font-bold text-lg mb-2">Film Length</h3>
-                    <p>{film.film_length}</p>
+                    <p>{film.duration}</p>
                   </div>
                 </div>
                 
                 <div className="flex items-center mb-6">
                   <h2 className="text-3xl font-bold mr-4">Score</h2>
-                  <div className="text-4xl font-bold">{averageScore}/10</div>
+                  <div className="text-4xl font-bold">{film.rating}/10</div>
                 </div>
                 
                 <div className="flex gap-4">

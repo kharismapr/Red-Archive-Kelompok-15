@@ -1,10 +1,39 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Logo from '../assets/Logo.svg';
 import Icon from '../assets/Popfilm.svg';
 
 
 export default function Registration() {
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const navigate = useNavigate();
+    
+    const RegisterHandler = async() => {
+        try{
+            console.log(name,email,password)
+            if(name.length === 0 || password.length === 0 || email.length === 0){
+                navigate("/register");
+            }
+            else{
+                const response = await axios.post("https://red-archive-kelompok-15.vercel.app/user/register", {
+                    name: name,
+                    email: email,
+                    password: password
+                },null);
+                if(response.status === 200){
+                    navigate("/login");
+                } else {
+                    throw new Error("Register failed")
+                }
+            }
+        }catch (error){
+            console.error(error);
+        }
+    }
+
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col lg:flex-row">
             {/* Left Section */}
@@ -25,6 +54,8 @@ export default function Registration() {
                     <input
                         type="text"
                         name="name"
+                        value={name} 
+                        onChange={(e) => setName(e.target.value)} 
                         placeholder="Enter your name"
                         className="w-full p-3 sm:p-4 rounded-lg border-2 border-[#BE3C44] focus:outline-none focus:border-[#BE3C44] focus:ring focus:ring-[#BE3C44]/20 text-sm sm:text-base"
                         required
@@ -33,6 +64,8 @@ export default function Registration() {
                     <input
                         type="email"
                         name="email"
+                        value={email} 
+                        onChange={(e) => setEmail(e.target.value)} 
                         placeholder="Enter your email"
                         className="w-full p-3 sm:p-4 rounded-lg border-2 border-[#BE3C44] focus:outline-none focus:border-[#BE3C44] focus:ring focus:ring-[#BE3C44]/20 text-sm sm:text-base"
                         required
@@ -42,6 +75,8 @@ export default function Registration() {
                         <input
                             type="password"
                             name="password"
+                            value={password} 
+                            onChange={(e) => setPassword(e.target.value)} 
                             placeholder="Create your password"
                             className="w-full p-3 sm:p-4 rounded-lg border-2 border-[#BE3C44] focus:outline-none focus:border-[#BE3C44] focus:ring focus:ring-[#BE3C44]/20 text-sm sm:text-base"
                             required
@@ -54,7 +89,7 @@ export default function Registration() {
                     <button
                         type="button"
                         className="w-full py-3 sm:py-4 bg-[#BE3C44] text-white rounded-lg font-semibold hover:bg-opacity-90 transition-all text-sm sm:text-base"
-                        onClick={() => navigate('/login')}
+                        onClick={RegisterHandler}
                     >
                         Register
                     </button>
