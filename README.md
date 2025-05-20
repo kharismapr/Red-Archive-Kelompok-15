@@ -26,6 +26,8 @@ RedArchive dirancang sebagai platform interaktif yang menggabungkan fitur review
 
 ## Preview Web
 
+**Link Deploy:** https://red-archive-kelompok-15-37xs.vercel.app/
+
 ### Home
 ![home](https://hackmd.io/_uploads/rkqtRX9bex.jpg)
 
@@ -46,7 +48,6 @@ RedArchive dirancang sebagai platform interaktif yang menggabungkan fitur review
 
 ### Post Reply
 ![post](https://hackmd.io/_uploads/B1cFRQcWeg.jpg)
-
 
 ## Progress Meeting
 
