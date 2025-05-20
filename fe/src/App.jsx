@@ -12,6 +12,7 @@ import FilmDetail from './pages/FilmDetail.jsx';
 import FilmReview from './pages/FilmReview.jsx';
 import { ThreadList } from './pages/Forum/ThreadList/ThreadList';
 import { ThreadPage } from './pages/Thread/ThreadPage'; // Add this import
+import ArchivePage from './pages/Archive/ArchivePage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -106,6 +107,12 @@ export default function App() {
         <Route path="/thread/:threadId" element={
           <PageTransition>
             <ThreadPage />
+          </PageTransition>
+        } />
+        
+        <Route path="/archive" element={
+          <PageTransition>
+            <ArchivePage />
           </PageTransition>
         } />
         
