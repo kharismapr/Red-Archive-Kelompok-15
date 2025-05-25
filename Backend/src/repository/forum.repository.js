@@ -18,7 +18,7 @@ const parser = new DatauriParser();
 exports.getAll = async() => {
     try {
         const res = await db.query(
-            "SELECT * FROM forum;"
+            "SELECT forum.id as id, forum.name AS name,forum.thread_count AS thread_count, forum.post_count AS post_count, last_post_id, cover_picture, post.created_at AS created_at, users.name as username FROM forum LEFT JOIN post on last_post_id = post.id LEFT JOIN users on post.user_id = users.id;"
         );
         return res.rows;
     } catch (error) {

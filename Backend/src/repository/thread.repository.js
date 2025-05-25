@@ -6,7 +6,7 @@ const db = require('../database/pg.database');
 exports.getAll = async() => {
     try {
         const res = await db.query(
-            "SELECT * FROM thread;"
+            "SELECT * FROM thread LEFT JOIN forum on thread.forum_id = forum.id LEFT JOIN post on forum.last_post_id = post.id LEFT JOIN users on post.user_id = users.id;"
         );
         return res.rows;
     } catch (error) {
@@ -41,6 +41,7 @@ exports.getById = async(thread_id) => {
 //         "name":,
 //         "film_id": <OPTIONAL>,
 //         "original_poster_id":,
+//         "forum_id":,
 //         "thread_info":
 //     }
 exports.createThread = async(thread) => {
@@ -49,13 +50,13 @@ exports.createThread = async(thread) => {
         // Return the thread
         if(!thread.film_id) {
             res = await db.query(
-                "INSERT INTO thread (name, original_poster_id, thread_info) VALUES ($1, $2, $3) RETURNING *;",
-                [thread.name, thread.original_poster_id, thread.thread_info]
+                "INSERT INTO thread (name, original_poster_id, thread_info, forum_id) VALUES ($1, $2, $3, $4) RETURNING *;",
+                [thread.name, thread.original_poster_id, thread.thread_info, thread.forum_id]
             );
         } else {
             res = await db.query(
-                "INSERT INTO thread (name, film_id, original_poster_id, thread_info) VALUES ($1, $2, $3, $4) RETURNING *;",
-                [thread.name, thread.film_id, thread.original_poster_id, thread.thread_info]
+                "INSERT INTO thread (name, film_id, original_poster_id, thread_info, forum_id) VALUES ($1, $2, $3, $4, $5) RETURNING *;",
+                [thread.name, thread.film_id, thread.original_poster_id, thread.thread_info, thread.forum_id]
             );
         }
         return res.rows[0];

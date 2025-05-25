@@ -44,6 +44,7 @@ exports.getById = async(req, res) => {
 //         "name":,
 //         "film_id": <OPTIONAL>,
 //         "original_poster_id":,
+//         "forum_id":,
 //         "thread_info":
 //     }
 exports.createThread = async(req, res) => {
