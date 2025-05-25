@@ -50,12 +50,32 @@ exports.getSpecific = async(req, res) => {
 //           if empty pass ""
 exports.createReview = async(req, res) => {
     try {
-        const review = await reviewRepository.createReview(req.body);
+        // Validate required fields
+        const { film_id, user_id, rating, details } = req.body;
+        if (!film_id || !user_id || !rating) {
+            return r.resp(res, false, 400, "Missing required fields", null);
+        }
+
+        // Validate rating is between 1-10
+        if (rating < 1 || rating > 10) {
+            return r.resp(res, false, 400, "Rating must be between 1 and 10", null);
+        }
+
+        const review = await reviewRepository.createReview({
+            film_id,
+            user_id,
+            rating,
+            details: details || ''
+        });
+
         if(review) {
-            r.resp(res, true, 200, "Review inserted successfully", review);
+            r.resp(res, true, 201, "Review created successfully", review);
+        } else {
+            r.resp(res, false, 500, "Failed to create review", null);
         }
     } catch (error) {
-        r.resp(res, false, 500, "Error inserting review", error);
+        console.error("Error in createReview:", error);
+        r.resp(res, false, 500, "Error creating review", { error: error.message });
     }
 }
 
@@ -98,3 +118,23 @@ exports.deleteReview = async(req, res) => {
         r.resp(res, false, 500, "Error deleting review", error);
     }
 }
+
+
+// Get reviews by film ID
+exports.getByFilmId = async(req, res) => {
+    try {
+        const { id } = req.params;
+        if (!id) {
+            return r.resp(res, false, 400, "Film ID is required", null);
+        }
+
+        const reviews = await reviewRepository.getSpecific(id);
+        if(reviews && reviews.length > 0) {
+            r.resp(res, true, 200, "Reviews retrieved successfully", reviews);
+        } else {
+            r.resp(res, true, 200, "No reviews found", []);
+        }
+    } catch (error) {
+        r.resp(res, false, 500, "Error retrieving reviews", error);
+    }
+};

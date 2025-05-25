@@ -1,8 +1,15 @@
 import { Link } from 'react-router-dom';
 
+// Helper function untuk membuat slug
+const createSlug = (title) => {
+  return encodeURIComponent(title.toLowerCase()
+    .replace(/[^a-z0-9]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, ''));
+};
+
 export default function FilmCard({ film }) {
-  // Membuat slug dari judul film untuk URL
-  const filmSlug = film.title.toLowerCase().replace(/\s+/g, '-');
+  const filmSlug = createSlug(film.title);
   
   return (
     <Link 

@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { Header } from '../components/Header/Header.jsx';
 import { Footer } from '../components/Footer/Footer.jsx';
-import films from './filmsData.jsx';
-import reviews from './reviewsData.jsx';
 
 export default function FilmReview() {
   const { filmSlug } = useParams();
@@ -14,26 +13,67 @@ export default function FilmReview() {
     comment: ''
   });
   const [showFullSynopsis, setShowFullSynopsis] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   
-  // Mencari film berdasarkan slug
   useEffect(() => {
-    const foundFilm = films.find(f => 
-      f.title.toLowerCase().replace(/\s+/g, '-') === filmSlug
-    );
+    const fetchFilm = async () => {
+      try {
+        setIsLoading(true);
+        const decodedSlug = decodeURIComponent(filmSlug);
+        const response = await axios.get(`https://red-archive-kelompok-15.vercel.app/film/getBySlug/${encodeURIComponent(decodedSlug)}`);
+        
+        if (response.data.success) {
+          setFilm(response.data.payload);
+        } else {
+          throw new Error('Film not found');
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
     
-    if (foundFilm) {
-      setFilm(foundFilm);
-      
-      // Cek apakah user sudah pernah review film ini (dalam implementasi nyata)
-      // const userReview = reviews.find(r => r.film_id === foundFilm.id && r.user_id === 'current_user_id');
-      // if (userReview) {
-      //   setReviewData({
-      //     score: userReview.score,
-      //     comment: userReview.comment
-      //   });
-      // }
-    }
+    fetchFilm();
   }, [filmSlug]);
+
+  // Handler untuk submit review
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      if (!film || !film.id) {
+        throw new Error('Film data not found');
+      }
+      
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        throw new Error('Please log in to submit a review');
+      }
+
+      const reviewPayload = {
+        film_id: film.id,
+        user_id: userId,
+        rating: reviewData.score,
+        details: reviewData.comment
+      };
+
+      const response = await axios.post('https://red-archive-kelompok-15.vercel.app/review/insert',
+        reviewPayload
+      );
+
+      if (response.data.success) {
+        // Redirect ke halaman detail film jika berhasil
+        navigate(`/film/${filmSlug}`);
+      } else {
+        throw new Error(response.data.message || 'Failed to submit review');
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert(error.message || 'Failed to submit review. Please try again.');
+    }
+  };
 
   // Handler untuk perubahan input
   const handleInputChange = (e) => {
@@ -55,22 +95,6 @@ export default function FilmReview() {
   // Handler untuk toggle synopsis
   const toggleSynopsis = () => {
     setShowFullSynopsis(!showFullSynopsis);
-  };
-
-  // Handler untuk submit review
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Dalam implementasi nyata, kirim data ke backend
-    console.log('Submitting review:', {
-      film_id: film.id,
-      user_id: 'current_user_id', // Dalam implementasi nyata, ambil dari state auth
-      score: reviewData.score,
-      comment: reviewData.comment
-    });
-    
-    // Redirect ke halaman detail film
-    navigate(`/film/${filmSlug}`);
   };
 
   // Jika film tidak ditemukan

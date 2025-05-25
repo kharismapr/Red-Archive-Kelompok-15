@@ -4,6 +4,14 @@ import axios from 'axios';
 import { Header } from '../components/Header/Header.jsx';
 import { Footer } from '../components/Footer/Footer.jsx';
 
+// Helper function untuk membuat slug
+const createSlug = (title) => {
+  return encodeURIComponent(title.toLowerCase()
+    .replace(/[^a-z0-9]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, ''));
+};
+
 export default function Film() {
   const navigate = useNavigate();
   const [displayedFilms, setDisplayedFilms] = useState([]);
@@ -128,7 +136,7 @@ export default function Film() {
                 {displayedFilms.map((film, index) => (
                   <Link 
                     key={index}
-                    to={`/film/${film.title.toLowerCase().replace(/\s+/g, '-')}`} 
+                    to={`/film/${createSlug(film.title)}`} 
                     className="block bg-[#7B191F] rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
                   >
                     <div className="p-3">

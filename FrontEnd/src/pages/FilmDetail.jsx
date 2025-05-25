@@ -16,13 +16,17 @@ export default function FilmDetail() {
   useEffect(() => {
     fetchFilmAndReviews();
   }, [filmSlug]);
+
   const fetchFilmAndReviews = async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      console.log('Fetching film with slug:', filmSlug);
-      const filmResponse = await axios.get(`https://red-archive-kelompok-15.vercel.app/film/getBySlug/${encodeURIComponent(filmSlug)}`);
+      // Decode the slug before sending to API
+      const decodedSlug = decodeURIComponent(filmSlug);
+      console.log('Fetching film with slug:', decodedSlug);
+
+      const filmResponse = await axios.get(`https://red-archive-kelompok-15.vercel.app/film/getBySlug/${encodeURIComponent(decodedSlug)}`);
       console.log('Film response:', filmResponse.data);
       
       if (!filmResponse.data.success) {
@@ -39,23 +43,31 @@ export default function FilmDetail() {
           seconds = parseInt(seconds) || 0;
           const totalMinutes = (hours * 60) + minutes;
           filmData.duration = `${totalMinutes} Minutes`;
+        } else if (typeof filmData.duration === 'string') {
+          // If duration is already formatted, use it as is
+          filmData.duration = filmData.duration;
+        } else {
+          // Default duration if not available
+          filmData.duration = 'Duration not available';
         }
         
         setFilm(filmData);
 
-        // Get film reviews
-        const reviewsResponse = await axios.get(`https://red-archive-kelompok-15.vercel.app/review/getByFilmId/${filmData.id}`);
-        if (reviewsResponse.data.success) {
-          const reviews = reviewsResponse.data.payload || [];
-          setFilmReviews(reviews);
+        try {
+          // Get film reviews
+          const reviewsResponse = await axios.get(`https://red-archive-kelompok-15.vercel.app/review/getByFilmId/${filmData.id}`);
+          if (reviewsResponse.data.success) {
+            const reviews = reviewsResponse.data.payload || [];
+            setFilmReviews(reviews);
 
-          // Calculate average score
-          if (reviews.length > 0) {
-            const totalScore = reviews.reduce((sum, review) => sum + review.rating, 0);
-            setAverageScore((totalScore / reviews.length).toFixed(1));
+            // Calculate average score
+            if (reviews.length > 0) {
+              const totalScore = reviews.reduce((sum, review) => sum + (review.rating || 0), 0);
+              setAverageScore((totalScore / reviews.length).toFixed(1));
+            }
           }
-        } else {
-          console.warn('No reviews found:', reviewsResponse.data.message);
+        } catch (reviewError) {
+          console.warn('Error fetching reviews:', reviewError);
           setFilmReviews([]);
           setAverageScore(0);
         }
@@ -63,6 +75,7 @@ export default function FilmDetail() {
     } catch (error) {
       console.error("Error fetching data:", error);
       setError(error.response?.data?.message || "Failed to load film details. Please try again later.");
+      setFilm(null);
     } finally {
       setIsLoading(false);
     }
@@ -153,6 +166,8 @@ export default function FilmDetail() {
                 
                 <div className="mb-4">
                   <p className="text-sm mb-2">Duration: {film.duration}</p>
+                  <p className="text-sm mb-2">Release Date: {new Date(film.release_date).toLocaleDateString()}</p>
+                  <p className="text-sm mb-2">Cast: {film.actors.join(', ')}</p>
                   <p className="text-sm">Directed by {film.directors.join(', ')}</p>
                 </div>
                 
@@ -170,7 +185,7 @@ export default function FilmDetail() {
                 </div>
                 
                 <Link
-                  to={`/film/${filmSlug}/review`}
+                  to={`/review/${filmSlug}`}
                   className="inline-block bg-yellow-400 text-[#7B191F] px-6 py-2 rounded-md font-semibold hover:bg-yellow-300 transition-colors"
                 >
                   Write a Review
@@ -191,16 +206,16 @@ export default function FilmDetail() {
                       <div className="flex items-center gap-2">
                         <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                           <span className="text-gray-600 font-bold">
-                            {review.user_name ? review.user_name[0] : 'U'}
+                            {review.user_name ? review.user_name[0].toUpperCase() : 'U'}
                           </span>
                         </div>
                         <div>
-                          <p className="font-semibold">{review.user_name || 'User'}</p>
+                          <p className="font-semibold">{review.user_name || 'Anonymous'}</p>
                           <p className="text-gray-500 text-sm">{new Date(review.created_at).toLocaleDateString()}</p>
                         </div>
                       </div>
                       <div className="bg-[#7B191F] text-white px-3 py-1 rounded-full">
-                        {review.score}/10
+                        {review.rating}/10
                       </div>
                     </div>
                     <p className="text-gray-700">{review.comment}</p>

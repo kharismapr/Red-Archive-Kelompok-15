@@ -39,23 +39,49 @@ exports.getSpecific = async(film_id, user_id) => {
     try {
         if(!film_id && user_id) {
             res = await db.query(
-                "SELECT * FROM review WHERE user_id = ($1);",
+                `SELECT 
+                    r.*,
+                    u.name as user_name
+                FROM review r
+                JOIN users u ON r.user_id = u.id
+                WHERE r.user_id = $1`,
                 [user_id]
             );
         } else if (film_id && !user_id) {
             res = await db.query(
-                "SELECT * FROM review WHERE film_id = ($1);",
+                `SELECT 
+                    r.*,
+                    u.name as user_name
+                FROM review r
+                JOIN users u ON r.user_id = u.id
+                WHERE r.film_id = $1`,
                 [film_id]
             );
         } else {
             res = await db.query(
-                "SELECT * FROM review WHERE film_id = ($1) AND user_id = ($2);",
+                `SELECT 
+                    r.*,
+                    u.name as user_name
+                FROM review r
+                JOIN users u ON r.user_id = u.id
+                WHERE r.film_id = $1 AND r.user_id = $2`,
                 [film_id, user_id]
             );
         }
-        return res.rows;
+        
+        // Transform response to match frontend expectations
+        return res.rows.map(review => ({
+            id: review.id,
+            film_id: review.film_id,
+            user_id: review.user_id,
+            user_name: review.user_name,
+            rating: review.rating,
+            comment: review.details,
+            created_at: review.created_at
+        }));
     } catch (error) {
-        console.log("Error qry ", error);
+        console.log("Error in getSpecific: ", error);
+        throw error;
     }
 }
 
@@ -73,20 +99,50 @@ exports.getSpecific = async(film_id, user_id) => {
 //           if empty pass ""
 exports.createReview = async(review) => {
     try {
-        // Return the review
-        const res = await db.query(
-            "INSERT INTO review (film_id, user_id, rating, details) VALUES ($1, $2, $3, $4) RETURNING *;",
-            [review.film_id, review.user_id, review.rating, review.details]
-        );
+        // Start a transaction since we're updating multiple tables
+        await db.query('BEGIN');
 
-        // Update the movie
-        const upd = await db.query(
-            "UPDATE film SET total_rating = total_rating + ($1), reviews = reviews + 1 WHERE id = ($2) RETURNING *;",
-            [review.rating, review.film_id]
-        );
-        return res.rows[0];
+        try {
+            // Insert the review
+            const reviewResult = await db.query(
+                `INSERT INTO review (film_id, user_id, rating, details, created_at) 
+                 VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) 
+                 RETURNING *;`,
+                [review.film_id, review.user_id, review.rating, review.details]
+            );
+
+            // Update the film's total rating and review count
+            await db.query(
+                `UPDATE film 
+                 SET total_rating = total_rating + $1, 
+                     reviews = reviews + 1 
+                 WHERE id = $2`,
+                [review.rating, review.film_id]
+            );
+
+            // Commit the transaction
+            await db.query('COMMIT');
+
+            // Get user info for the response
+            const userResult = await db.query(
+                'SELECT name as user_name FROM users WHERE id = $1',
+                [review.user_id]
+            );
+
+            // Return review with user info
+            return {
+                ...reviewResult.rows[0],
+                user_name: userResult.rows[0]?.user_name || 'Anonymous'
+            };
+
+        } catch (error) {
+            // If anything fails, rollback the transaction
+            await db.query('ROLLBACK');
+            throw error;
+        }
     } catch (error) {
-        console.log("Error qry ", error);
+        console.log("Error in createReview: ", error);
+        throw error;
     }
 }
 
