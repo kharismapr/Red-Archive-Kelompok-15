@@ -21,35 +21,35 @@ exports.getAll = async() => {
         const res = await db.query(
             `SELECT 
                 id,
-                name as title,
+                name,
                 genre,
-                description as synopsis,
-                CASE 
-                    WHEN reviews > 1 THEN (total_rating::real/(reviews::real-1))::numeric(10,1) 
-                    ELSE 0 
-                END AS rating,
+                description,
+                total_rating,
+                reviews,
                 duration,
                 release_date,
                 actor_name,
                 director_name,
-                cover_picture as image,
-                ARRAY[genre] as genres
-            FROM film`
+                cover_picture
+            FROM film;`
         );
-        
+
         // Transform the data to match frontend requirements
         return res.rows.map(film => ({
-            ...film,
+            id: film.id,
+            title: film.name,
             genres: film.genre.split(',').map(g => g.trim()),
+            synopsis: film.description,
+            rating: film.reviews > 1 ? (film.total_rating / (film.reviews - 1)).toFixed(1) : '0.0',
+            duration: film.duration,
+            release_date: film.release_date,
+            actors: film.actor_name.split(',').map(a => a.trim()),
             directors: [film.director_name],
-            duration: {
-                hours: parseInt(film.duration.hours) || 0,
-                minutes: parseInt(film.duration.minutes) || 0,
-                seconds: parseInt(film.duration.seconds) || 0
-            }
+            image: film.cover_picture,
+            reviews: film.reviews
         }));
     } catch (error) {
-        console.log("Error qry ", error);
+        console.log("Error in getAll: ", error);
         throw error;
     }
 }
@@ -61,15 +61,46 @@ exports.getAll = async() => {
 //     {
 //         "film_id":
 //     }
-exports.getById = async(film_id) => {
+exports.getById = async(filmId) => {
     try {
         const res = await db.query(
-            "SELECT id,name,genre,(total_rating::real/(reviews::real-1)) AS rating,duration,release_date,actor_name,director_name,cover_picture FROM film WHERE id = ($1);",
-            [film_id]
+            `SELECT 
+                id,
+                name,
+                genre,
+                description,
+                total_rating,
+                reviews,
+                duration,
+                release_date,
+                actor_name,
+                director_name,
+                cover_picture
+            FROM film 
+            WHERE id = $1;`,
+            [filmId]
         );
-        return res.rows[0];
+
+        if (res.rows[0]) {
+            const film = res.rows[0];
+            return {
+                id: film.id,
+                title: film.name,
+                genres: film.genre.split(',').map(g => g.trim()),
+                synopsis: film.description,
+                rating: film.reviews > 1 ? (film.total_rating / (film.reviews - 1)).toFixed(1) : '0.0',
+                duration: film.duration,
+                release_date: film.release_date,
+                actors: film.actor_name.split(',').map(a => a.trim()),
+                directors: [film.director_name],
+                image: film.cover_picture,
+                reviews: film.reviews
+            };
+        }
+        return null;
     } catch (error) {
-        console.log("Error qry ", error);
+        console.log("Error in getById: ", error);
+        throw error;
     }
 }
 
@@ -168,36 +199,37 @@ exports.deleteUser = async(id) => {
 }
 
 
-// Get film by slug (converted from name)
+// Get film by slug
 exports.getBySlug = async(slug) => {
     try {
-        // Convert slug back to potential film name by replacing hyphens with spaces
-        const possibleName = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        // Convert slug back to potential name by replacing hyphens with spaces
+        // and properly capitalizing words
+        const possibleName = slug
+            .split('-')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
         
         const res = await db.query(
-            `SELECT id, name as title, genre, description as synopsis,
-                CASE 
-                    WHEN reviews > 1 THEN (total_rating::real/(reviews::real-1))::numeric(10,1) 
-                    ELSE 0 
-                END AS rating, duration, release_date, actor_name, director_name, cover_picture as image
+            `SELECT 
+                id,
+                name,
+                genre,
+                description,
+                total_rating,
+                reviews,
+                duration,
+                release_date,
+                actor_name,
+                director_name,
+                cover_picture
             FROM film 
             WHERE LOWER(name) = LOWER($1)`,
             [possibleName]
         );
         
-        if (res.rows[0]) {
-            const film = res.rows[0];
-            // Transform the data to match frontend requirements
-            return {
-                ...film,
-                genres: film.genre.split(',').map(g => g.trim()),
-                directors: [film.director_name],
-                actors: film.actor_name.split(',').map(a => a.trim())
-            };
-        }
-        return null;
+        return res.rows[0] || null;
     } catch (error) {
-        console.log("Error qry ", error);
+        console.log("Error in getBySlug: ", error);
         throw error;
     }
 }

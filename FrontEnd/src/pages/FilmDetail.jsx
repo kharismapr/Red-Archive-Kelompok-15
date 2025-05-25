@@ -16,24 +16,28 @@ export default function FilmDetail() {
   useEffect(() => {
     fetchFilmAndReviews();
   }, [filmSlug]);
-
   const fetchFilmAndReviews = async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Get film details using the new endpoint
+      console.log('Fetching film with slug:', filmSlug);
       const filmResponse = await axios.get(`https://red-archive-kelompok-15.vercel.app/film/getBySlug/${filmSlug}`);
-      const filmData = filmResponse.data.payload;
+      console.log('Film response:', filmResponse.data);
+      
+      if (!filmResponse.data.success) {
+        throw new Error(filmResponse.data.message || 'Failed to fetch film details');
+      }
 
+      const filmData = filmResponse.data.payload;
       if (filmData) {
         // Format duration
         let {hours, minutes, seconds} = filmData.duration;
-        hours = hours || 0;
-        minutes = minutes || 0;
-        seconds = seconds || 0;
-        minutes += hours * 60;
-        filmData.duration = `${minutes} Minutes`;
+        hours = parseInt(hours) || 0;
+        minutes = parseInt(minutes) || 0;
+        seconds = parseInt(seconds) || 0;
+        const totalMinutes = (hours * 60) + minutes;
+        filmData.duration = `${totalMinutes} Minutes`;
         
         setFilm(filmData);
 
