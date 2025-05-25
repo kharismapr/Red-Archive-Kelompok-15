@@ -12,6 +12,31 @@ const parser = new DatauriParser();
 
 
 
+// Method untuk transformasi data film
+const transformFilmData = (film) => {
+    return {
+        id: film.id,
+        title: film.name,
+        genres: film.genre.split(',').map(g => g.trim()),
+        synopsis: film.description,
+        rating: calculateRating(film.total_rating, film.reviews),
+        duration: film.duration,
+        release_date: film.release_date,
+        actors: film.actor_name.split(',').map(a => a.trim()),
+        directors: [film.director_name],
+        image: film.cover_picture,
+        reviews: film.reviews
+    };
+};
+
+// Helper function untuk menghitung rating
+const calculateRating = (total_rating, reviews) => {
+    if (reviews === 0) return '0.0';
+    // Rating adalah total_rating dibagi 2 (karena total_rating sudah merupakan penjumlahan dengan rating baru)
+    const rating = (total_rating / 2).toFixed(1);
+    return rating;
+};
+
 // Retrieve all films
 // raw req.body
 //     {
@@ -35,19 +60,7 @@ exports.getAll = async() => {
         );
 
         // Transform the data to match frontend requirements
-        return res.rows.map(film => ({
-            id: film.id,
-            title: film.name,
-            genres: film.genre.split(',').map(g => g.trim()),
-            synopsis: film.description,
-            rating: film.reviews > 1 ? (film.total_rating / (film.reviews - 1)).toFixed(1) : '0.0',
-            duration: film.duration,
-            release_date: film.release_date,
-            actors: film.actor_name.split(',').map(a => a.trim()),
-            directors: [film.director_name],
-            image: film.cover_picture,
-            reviews: film.reviews
-        }));
+        return res.rows.map(film => transformFilmData(film));
     } catch (error) {
         console.log("Error in getAll: ", error);
         throw error;
@@ -82,20 +95,7 @@ exports.getById = async(filmId) => {
         );
 
         if (res.rows[0]) {
-            const film = res.rows[0];
-            return {
-                id: film.id,
-                title: film.name,
-                genres: film.genre.split(',').map(g => g.trim()),
-                synopsis: film.description,
-                rating: film.reviews > 1 ? (film.total_rating / (film.reviews - 1)).toFixed(1) : '0.0',
-                duration: film.duration,
-                release_date: film.release_date,
-                actors: film.actor_name.split(',').map(a => a.trim()),
-                directors: [film.director_name],
-                image: film.cover_picture,
-                reviews: film.reviews
-            };
+            return transformFilmData(res.rows[0]);
         }
         return null;
     } catch (error) {
@@ -228,20 +228,7 @@ exports.getBySlug = async(slug) => {
         );
 
         if (res.rows[0]) {
-            const film = res.rows[0];
-            return {
-                id: film.id,
-                title: film.name,
-                genres: film.genre.split(',').map(g => g.trim()),
-                synopsis: film.description,
-                rating: film.reviews > 1 ? (film.total_rating / (film.reviews - 1)).toFixed(1) : '0.0',
-                duration: film.duration,
-                release_date: film.release_date,
-                actors: film.actor_name.split(',').map(a => a.trim()),
-                directors: [film.director_name],
-                image: film.cover_picture,
-                reviews: film.reviews
-            };
+            return transformFilmData(res.rows[0]);
         }
         return null;
     } catch (error) {

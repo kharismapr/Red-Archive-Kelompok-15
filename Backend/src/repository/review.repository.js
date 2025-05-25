@@ -109,15 +109,23 @@ exports.createReview = async(review) => {
                  VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) 
                  RETURNING *;`,
                 [review.film_id, review.user_id, review.rating, review.details]
+            );            // Get current film data
+            const currentFilm = await db.query(
+                'SELECT total_rating, reviews FROM film WHERE id = $1',
+                [review.film_id]
             );
 
-            // Update the film's total rating and review count
+            const film = currentFilm.rows[0];
+            // Hitung rating baru = (total_rating + rating_baru) / 2
+            const newTotalRating = film.total_rating + review.rating;
+            
+            // Update film's total rating and review count
             await db.query(
                 `UPDATE film 
-                 SET total_rating = total_rating + $1, 
+                 SET total_rating = $1,
                      reviews = reviews + 1 
                  WHERE id = $2`,
-                [review.rating, review.film_id]
+                [newTotalRating, review.film_id]
             );
 
             // Commit the transaction
