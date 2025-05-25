@@ -21,6 +21,7 @@ export default function Login() {
                     password: password
                 },null);
                 if(response.status === 200){
+                    localStorage.clear();
                     localStorage.setItem('id', response.data.payload.id)
                     localStorage.setItem('user', response.data.payload.name)
                     localStorage.setItem('email', response.data.payload.email)

@@ -6,7 +6,7 @@ export const ForumTableRow = ({ forum }) => {
     
     const handleForumClick = () => {
         // Convert forum title to URL-friendly format
-        const forumId = forum.title.toLowerCase().replace(/\s+/g, '-');
+        const forumId = forum.name.toLowerCase().replace(/\s+/g, '-');
         navigate(`/forum/${forumId}`);
     };
 
@@ -17,11 +17,11 @@ export const ForumTableRow = ({ forum }) => {
                     <img 
                         alt="Forum icon" 
                         className="w-12 h-12 rounded-lg shadow-md" 
-                        src={forum.icon}
+                        src={forum.cover_picture}
                     />
                     <div>
                         <span className="text-red-800 font-semibold text-lg hover:underline">
-                            {forum.title}
+                            {forum.name}
                         </span>
                         <p className="text-xs text-red-900 mt-1 max-w-xs leading-tight">
                             {forum.description}
@@ -30,16 +30,16 @@ export const ForumTableRow = ({ forum }) => {
                 </div>
             </td>
             <td className="border-b border-red-300 px-6 py-4 text-sm text-red-900 font-medium text-center">
-                {forum.threads}
+                {forum.thread_count}
             </td>
             <td className="border-b border-red-300 px-6 py-4 text-sm text-red-900 font-medium text-center">
-                {forum.posts}
+                {forum.post_count}
             </td>
             <td className="border-b border-red-300 px-6 py-4 text-sm text-red-900">
                 <p>
-                    <span className="font-semibold text-red-900">{forum.lastPost.user}</span>
+                    <span className="font-semibold text-red-900">{forum.username}</span>
                     <br/>
-                    <span className="text-xs text-red-700">{forum.lastPost.date}</span>
+                    <span className="text-xs text-red-700">{forum.created_at}</span>
                 </p>
             </td>
         </tr>

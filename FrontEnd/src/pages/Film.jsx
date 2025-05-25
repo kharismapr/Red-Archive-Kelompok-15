@@ -5,6 +5,7 @@ import { Footer } from '../components/Footer/Footer.jsx';
 import films from './filmsData.jsx';
 
 export default function Film() {
+    let filmSlug;
     const navigate = useNavigate();
     // State untuk film yang ditampilkan dan filter
     const [displayedFilms, setDisplayedFilms] = useState(films);
@@ -87,7 +88,7 @@ export default function Film() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-2">
               {displayedFilms.map((film, index) => {
                 // Membuat slug dari judul film untuk URL
-                const filmSlug = film.title.toLowerCase().replace(/\s+/g, '-');
+                filmSlug = film.title.toLowerCase().replace(/\s+/g, '-');
                 
                 return (
                   <Link 

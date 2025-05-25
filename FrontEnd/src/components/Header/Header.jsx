@@ -10,7 +10,6 @@ export function Header() {
 
   useEffect(() => {
     const userStr = localStorage.getItem('user');
-    console.log(localStorage)
     if (userStr) {
       setUserName(userStr);
     }

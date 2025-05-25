@@ -5,14 +5,14 @@ export const ThreadItem = ({ thread }) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        const threadId = thread.title.toLowerCase().replace(/\s+/g, '-');
+        const threadId = thread.thread_name.toLowerCase().replace(/\s+/g, '-');
         navigate(`/thread/${threadId}`, { 
             state: {
-                title: thread.title,
-                author: thread.author,
-                authorAvatarUrl: thread.avatarUrl,
-                authorAvatarAlt: thread.avatarAlt,
-                postDate: thread.lastPost,
+                name: thread.name,
+                username: thread.username,
+                username_profile_picture: thread.profile_picture,
+                username_profile_alt: thread.avatarAlt,
+                postDate: thread.created_at,
                 replyCount: thread.replies
             }
         });
@@ -23,16 +23,15 @@ export const ThreadItem = ({ thread }) => {
             <div className="flex justify-between items-start">
                 <div className="flex space-x-4">
                     <img 
-                        alt={thread.avatarAlt} 
                         className="w-14 h-14 shadow" 
-                        src={thread.avatarUrl}
+                        src={thread.profile_picture}
                     />
                     <div>
                         <div className="text-red-800 font-semibold text-xl hover:underline">
-                            {thread.title}
+                            {thread.name}
                         </div>
                         <p className="text-sm text-red-900 mt-1 max-w-xl leading-relaxed">
-                            {thread.description}
+                            {thread.thread_name}
                         </p>
                         <div className="mt-2 text-xs text-red-700 flex space-x-4">
                             <span><i className="far fa-comments mr-1"></i>{thread.replies} replies</span>
@@ -41,8 +40,8 @@ export const ThreadItem = ({ thread }) => {
                     </div>
                 </div>
                 <div className="text-right text-red-900 text-xs">
-                    <p className="font-semibold">{thread.author}</p>
-                    <p className="mt-1">{thread.lastPost}</p>
+                    <p className="font-semibold">{thread.username}</p>
+                    <p className="mt-1">{thread.created_at}</p>
                 </div>
             </div>
         </li>
