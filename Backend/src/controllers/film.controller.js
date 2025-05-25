@@ -111,3 +111,20 @@ exports.deleteFilm = async(req, res) => {
         r.resp(res, false, 500, "Error deleting film", error);
     }
 }
+
+// Get film by slug
+exports.getBySlug = async(req, res) => {
+    try {
+        const { slug } = req.params;
+        const film = await filmRepository.getBySlug(slug);
+        
+        if(film) {
+            r.resp(res, true, 200, "Film retrieved successfully", film);
+        } else {
+            r.resp(res, false, 404, "Film not found", null)
+        }
+    } catch (error) {
+        console.error("Error in getBySlug:", error);
+        r.resp(res, false, 500, "Error retrieving film", error.message);
+    }
+}

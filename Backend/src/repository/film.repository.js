@@ -19,11 +19,38 @@ const parser = new DatauriParser();
 exports.getAll = async() => {
     try {
         const res = await db.query(
-            "SELECT id,name,genre,(total_rating::real/(reviews::real)) AS rating,duration,release_date,actor_name,director_name,cover_picture FROM film;"
+            `SELECT 
+                id,
+                name as title,
+                genre,
+                description as synopsis,
+                CASE 
+                    WHEN reviews > 1 THEN (total_rating::real/(reviews::real-1))::numeric(10,1) 
+                    ELSE 0 
+                END AS rating,
+                duration,
+                release_date,
+                actor_name,
+                director_name,
+                cover_picture as image,
+                ARRAY[genre] as genres
+            FROM film`
         );
-        return res.rows;
+        
+        // Transform the data to match frontend requirements
+        return res.rows.map(film => ({
+            ...film,
+            genres: film.genre.split(',').map(g => g.trim()),
+            directors: [film.director_name],
+            duration: {
+                hours: parseInt(film.duration.hours) || 0,
+                minutes: parseInt(film.duration.minutes) || 0,
+                seconds: parseInt(film.duration.seconds) || 0
+            }
+        }));
     } catch (error) {
         console.log("Error qry ", error);
+        throw error;
     }
 }
 
@@ -137,5 +164,40 @@ exports.deleteUser = async(id) => {
         return res.rows[0];
     } catch (error) {
         console.log("Error qry ", error);
+    }
+}
+
+
+// Get film by slug (converted from name)
+exports.getBySlug = async(slug) => {
+    try {
+        // Convert slug back to potential film name by replacing hyphens with spaces
+        const possibleName = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        
+        const res = await db.query(
+            `SELECT id, name as title, genre, description as synopsis,
+                CASE 
+                    WHEN reviews > 1 THEN (total_rating::real/(reviews::real-1))::numeric(10,1) 
+                    ELSE 0 
+                END AS rating, duration, release_date, actor_name, director_name, cover_picture as image
+            FROM film 
+            WHERE LOWER(name) = LOWER($1)`,
+            [possibleName]
+        );
+        
+        if (res.rows[0]) {
+            const film = res.rows[0];
+            // Transform the data to match frontend requirements
+            return {
+                ...film,
+                genres: film.genre.split(',').map(g => g.trim()),
+                directors: [film.director_name],
+                actors: film.actor_name.split(',').map(a => a.trim())
+            };
+        }
+        return null;
+    } catch (error) {
+        console.log("Error qry ", error);
+        throw error;
     }
 }
