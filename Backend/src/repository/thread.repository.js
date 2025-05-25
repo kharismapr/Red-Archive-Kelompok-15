@@ -6,7 +6,7 @@ const db = require('../database/pg.database');
 exports.getAll = async() => {
     try {
         const res = await db.query(
-            "SELECT * FROM thread LEFT JOIN forum on thread.forum_id = forum.id LEFT JOIN post on forum.last_post_id = post.id LEFT JOIN users on post.user_id = users.id;"
+            "SELECT users.profile_picture as profile_picture, thread.name as name, thread.name as thread_name, thread.thread_info as thread_info, users.name as username, post.created_at as created_at FROM thread LEFT JOIN forum on thread.forum_id = forum.id LEFT JOIN post on forum.last_post_id = post.id LEFT JOIN users on post.user_id = users.id;"
         );
         return res.rows;
     } catch (error) {
