@@ -203,12 +203,12 @@ exports.deleteUser = async(id) => {
 exports.getBySlug = async(slug) => {
     try {
         // Convert slug back to potential name by replacing hyphens with spaces
-        // and properly capitalizing words
-        const possibleName = slug
+        // and properly capitalizing each word
+        const possibleName = decodeURIComponent(slug)
             .split('-')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
             .join(' ');
-        
+
         const res = await db.query(
             `SELECT 
                 id,
@@ -223,11 +223,27 @@ exports.getBySlug = async(slug) => {
                 director_name,
                 cover_picture
             FROM film 
-            WHERE LOWER(name) = LOWER($1)`,
+            WHERE LOWER(TRIM(name)) = LOWER(TRIM($1))`,
             [possibleName]
         );
-        
-        return res.rows[0] || null;
+
+        if (res.rows[0]) {
+            const film = res.rows[0];
+            return {
+                id: film.id,
+                title: film.name,
+                genres: film.genre.split(',').map(g => g.trim()),
+                synopsis: film.description,
+                rating: film.reviews > 1 ? (film.total_rating / (film.reviews - 1)).toFixed(1) : '0.0',
+                duration: film.duration,
+                release_date: film.release_date,
+                actors: film.actor_name.split(',').map(a => a.trim()),
+                directors: [film.director_name],
+                image: film.cover_picture,
+                reviews: film.reviews
+            };
+        }
+        return null;
     } catch (error) {
         console.log("Error in getBySlug: ", error);
         throw error;

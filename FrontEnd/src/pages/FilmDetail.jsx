@@ -22,7 +22,7 @@ export default function FilmDetail() {
       setError(null);
 
       console.log('Fetching film with slug:', filmSlug);
-      const filmResponse = await axios.get(`https://red-archive-kelompok-15.vercel.app/film/getBySlug/${filmSlug}`);
+      const filmResponse = await axios.get(`https://red-archive-kelompok-15.vercel.app/film/getBySlug/${encodeURIComponent(filmSlug)}`);
       console.log('Film response:', filmResponse.data);
       
       if (!filmResponse.data.success) {
@@ -31,25 +31,33 @@ export default function FilmDetail() {
 
       const filmData = filmResponse.data.payload;
       if (filmData) {
-        // Format duration
-        let {hours, minutes, seconds} = filmData.duration;
-        hours = parseInt(hours) || 0;
-        minutes = parseInt(minutes) || 0;
-        seconds = parseInt(seconds) || 0;
-        const totalMinutes = (hours * 60) + minutes;
-        filmData.duration = `${totalMinutes} Minutes`;
+        // Format duration if needed
+        if (typeof filmData.duration === 'object' && filmData.duration.hours !== undefined) {
+          let {hours, minutes, seconds} = filmData.duration;
+          hours = parseInt(hours) || 0;
+          minutes = parseInt(minutes) || 0;
+          seconds = parseInt(seconds) || 0;
+          const totalMinutes = (hours * 60) + minutes;
+          filmData.duration = `${totalMinutes} Minutes`;
+        }
         
         setFilm(filmData);
 
         // Get film reviews
         const reviewsResponse = await axios.get(`https://red-archive-kelompok-15.vercel.app/review/getByFilmId/${filmData.id}`);
-        const reviews = reviewsResponse.data.payload;
-        setFilmReviews(reviews);
+        if (reviewsResponse.data.success) {
+          const reviews = reviewsResponse.data.payload || [];
+          setFilmReviews(reviews);
 
-        // Calculate average score
-        if (reviews.length > 0) {
-          const totalScore = reviews.reduce((sum, review) => sum + review.rating, 0);
-          setAverageScore((totalScore / reviews.length).toFixed(1));
+          // Calculate average score
+          if (reviews.length > 0) {
+            const totalScore = reviews.reduce((sum, review) => sum + review.rating, 0);
+            setAverageScore((totalScore / reviews.length).toFixed(1));
+          }
+        } else {
+          console.warn('No reviews found:', reviewsResponse.data.message);
+          setFilmReviews([]);
+          setAverageScore(0);
         }
       }
     } catch (error) {

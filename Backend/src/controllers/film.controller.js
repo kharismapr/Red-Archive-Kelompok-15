@@ -122,26 +122,19 @@ exports.deleteFilm = async(req, res) => {
 exports.getBySlug = async(req, res) => {
     try {
         const { slug } = req.params;
+        if (!slug) {
+            return r.resp(res, false, 400, "Film slug is required", null);
+        }
+
         const film = await filmRepository.getBySlug(slug);
         
         if(film) {
-            r.resp(res, true, 200, "Film retrieved successfully", {
-                id: film.id,
-                title: film.name,
-                genres: film.genre.split(',').map(g => g.trim()),
-                synopsis: film.description,
-                rating: film.reviews > 1 ? (film.total_rating / (film.reviews - 1)).toFixed(1) : '0.0',
-                duration: film.duration,
-                release_date: film.release_date,
-                actors: film.actor_name.split(',').map(a => a.trim()),
-                directors: [film.director_name],
-                image: film.cover_picture
-            });
+            r.resp(res, true, 200, "Film retrieved successfully", film);
         } else {
-            r.resp(res, false, 404, "Film not found", null)
+            r.resp(res, false, 404, "Film not found", null);
         }
     } catch (error) {
         console.error("Error in getBySlug:", error);
-        r.resp(res, false, 500, "Error retrieving film", error.message);
+        r.resp(res, false, 500, "Error retrieving film", { error: error.message });
     }
 };
