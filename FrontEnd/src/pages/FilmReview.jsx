@@ -38,42 +38,53 @@ export default function FilmReview() {
     fetchFilm();
   }, [filmSlug]);
 
-  // Handler untuk submit review
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    try {
-      if (!film || !film.id) {
-        throw new Error('Film data not found');
-      }
-      
-      const userId = localStorage.getItem('userId');
-      if (!userId) {
-        throw new Error('Please log in to submit a review');
-      }
-
-      const reviewPayload = {
-        film_id: film.id,
-        user_id: userId,
-        rating: reviewData.score,
-        details: reviewData.comment
-      };
-
-      const response = await axios.post('https://red-archive-kelompok-15.vercel.app/review/insert',
-        reviewPayload
-      );
-
-      if (response.data.success) {
-        // Redirect ke halaman detail film jika berhasil
-        navigate(`/film/${filmSlug}`);
-      } else {
-        throw new Error(response.data.message || 'Failed to submit review');
-      }
-    } catch (error) {
-      console.error('Error submitting review:', error);
-      alert(error.message || 'Failed to submit review. Please try again.');
+// Handler untuk submit review
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  try {
+    if (!film || !film.id) {
+      throw new Error('Film data not found');
     }
-  };
+    
+    // Ambil userId dari localStorage dengan key yang benar
+    const userId = localStorage.getItem('id'); // Changed from 'userId' to 'id'
+    if (!userId) {
+      throw new Error('Please log in to submit a review');
+    }
+
+    if (reviewData.score < 1) {
+      throw new Error('Please select a score for your review');
+    }
+
+    const reviewPayload = {
+      film_id: film.id,
+      user_id: userId,
+      rating: parseInt(reviewData.score),
+      details: reviewData.comment
+    };
+
+    console.log('Sending review payload:', reviewPayload);
+
+    const response = await axios.post(
+      'https://red-archive-kelompok-15.vercel.app/review/insert',
+      reviewPayload
+    );
+
+    console.log('Response:', response.data); // Untuk debug
+
+    if (response.data.success) {
+      alert('Review submitted successfully!');
+      navigate(`/film/${filmSlug}`);
+    } else {
+      throw new Error(response.data.message || 'Failed to submit review');
+    }
+  } catch (error) {
+    console.error('Error submitting review:', error);
+    const errorMessage = error.response?.data?.message || error.message || 'Failed to submit review. Please try again.';
+    alert(errorMessage);
+  }
+};
 
   // Handler untuk perubahan input
   const handleInputChange = (e) => {
