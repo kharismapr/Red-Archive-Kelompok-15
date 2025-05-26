@@ -11,23 +11,51 @@ import { threads } from './threadData.jsx';
 import ThreadCard from '../components/ThreadCard.jsx';
 
 export default function Home() {
-  const [film, setFilm] = useState([{}]);
+  const [topFilms, setTopFilms] = useState([]);
+  const [allFilms, setAllFilms] = useState([]);
 
   useEffect(() => {
     handleHomePage();
   },[]);
 
-  
   const handleHomePage = async () => {
     try {
-      const response = await axios.get("https://red-archive-kelompok-15.vercel.app/film/getAll")
-      setFilm(response.data.payload.map((data) => data));
-      console.log("RESPMAP: ", response.data.payload.map((data) => data));
+      // Get all films
+      const response = await axios.get("https://red-archive-kelompok-15.vercel.app/film/getAll");
+      const films = response.data.payload || [];
+
+      // Get reviews for each film and calculate average rating
+      const filmsWithReviews = await Promise.all(films.map(async (film) => {
+        try {
+          const reviewsResponse = await axios.get(`https://red-archive-kelompok-15.vercel.app/review/getByFilmId/${film.id}`);
+          if (reviewsResponse.data.success) {
+            const reviews = reviewsResponse.data.payload || [];
+            if (reviews.length > 0) {
+              const totalScore = reviews.reduce((sum, review) => sum + (review.rating || 0), 0);
+              const averageScore = (totalScore / reviews.length).toFixed(1);
+              return { ...film, rating: averageScore, reviews: reviews.length };
+            }
+          }
+          return { ...film, rating: '0.0', reviews: 0 };
+        } catch (error) {
+          console.warn(`Error fetching reviews for film ${film.id}:`, error);
+          return { ...film, rating: '0.0', reviews: 0 };
+        }
+      }));
+
+      // Sort films by rating (descending)
+      const sortedFilms = filmsWithReviews.sort((a, b) => parseFloat(b.rating) - parseFloat(a.rating));
+      
+      // Get top 10 films for slider
+      const topTenFilms = sortedFilms.slice(0, 10);
+      
+      setTopFilms(topTenFilms);
+      setAllFilms(filmsWithReviews);
+      
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching films:", error);
     }
-  }
-  
+  };
 
   return (
     <div className="min-h-screen bg-[#BE3C44]">
@@ -48,13 +76,13 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Recommended Films Section with Netflix-style slider */}
+      {/* Top Rated Films Section with Netflix-style slider */}
       <FilmSlider 
-        title="Recommended for You" 
-        films={films} 
+        title="Top Rated Films"
+        films={topFilms}
       />
       
-      {/* All Films Section dengan grid layout */}
+      {/* All Films Section with grid layout */}
       <div className="py-8 px-4 bg-[#BE3C44]">
         <div className="mx-auto max-w-7xl">
           <div className="flex justify-between items-center mb-6 px-4">
@@ -65,10 +93,10 @@ export default function Home() {
           </div>
           <div className="border-t border-white/30 mb-6 mx-4"></div>
           
-          {/* Grid Film - hanya menampilkan 4 film pertama */}
+          {/* Grid Film - showing first 4 films */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-2">
-            {films.slice(0, 4).map((film, index) => {
-              // Membuat slug dari judul film untuk URL
+            {allFilms.slice(0, 4).map((film, index) => {
+              // Create slug from film title for URL
               const filmSlug = film.title.toLowerCase().replace(/\s+/g, '-');
               
               return (

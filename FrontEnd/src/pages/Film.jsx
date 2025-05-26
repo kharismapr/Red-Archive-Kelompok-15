@@ -3,6 +3,7 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Header } from '../components/Header/Header.jsx';
 import { Footer } from '../components/Footer/Footer.jsx';
+import FilmCard from '../components/FilmCard.jsx';
 
 // Helper function untuk membuat slug
 const createSlug = (title) => {
@@ -146,33 +147,15 @@ export default function Film() {
                   </div>
                 ))}
               </div>
-            ) : displayedFilms.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-2">
+            ) : displayedFilms.length > 0 ? (  
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-2">
                 {displayedFilms.map((film, index) => (
-                  <Link 
-                    key={index}
-                    to={`/film/${createSlug(film.title)}`} 
-                    className="block bg-[#7B191F] rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
-                  >
-                    <div className="p-3">
-                      <img
-                        src={film.image}
-                        alt={film.title}
-                        className="w-full h-[350px] object-cover rounded"
-                        onError={(e) => {
-                          e.target.src = 'https://res.cloudinary.com/drm5dmz1y/image/upload/v1747057110/default_missing_gehecc.jpg';
-                        }}
-                      />
+                  <div key={index}>
+                    <div className="p">
+                    <FilmCard film={film} />
                     </div>
-                    <div className="px-4 pb-4 text-white text-center">                      
-                      <h3 className="text-xl font-bold mb-1">{film.title}</h3>
-                      <p className="text-sm text-gray-300">{film.genres.join(', ')}</p>
-                      <div className="flex items-center justify-center gap-2 mt-1">
-                        <p className="text-sm text-yellow-400">★ {film.rating}</p>
-                    
-                      </div>
-                    </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             ) : (

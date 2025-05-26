@@ -43,14 +43,8 @@ function FilmSlider({ title, films, viewMoreLink }) {
   return (
     <div className="py-8 px-4 bg-[#BE3C44]">
       <div className="mx-auto max-w-7xl">
-        {/* Title and View More */}
         <div className="flex justify-between items-center mb-6 px-4">
           <h2 className="text-2xl font-bold text-white">{title}</h2>
-          {viewMoreLink && (
-            <Link to={viewMoreLink} className="text-white hover:text-gray-200 font-semibold">
-              View More →
-            </Link>
-          )}
         </div>
         
         {/* Horizontal line - Border yang ditambahkan */}
