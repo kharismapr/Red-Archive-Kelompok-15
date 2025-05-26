@@ -30,24 +30,39 @@ export default function Film() {
   const fetchFilms = async () => {
     try {
       setIsLoading(true);
-      setError(null);
-
-      console.log('Fetching films...');
+      setError(null);      console.log('Fetching films...');
       const response = await axios.get("https://red-archive-kelompok-15.vercel.app/film/getAll");
       console.log('Response:', response.data);
 
       if (!response.data || !response.data.success) {
         throw new Error(response.data?.message || 'Failed to fetch films');
-      }
-
+      }      // Ambil daftar film
       const films = response.data.payload || [];
-      console.log('Films:', films);
+      
+      // Untuk setiap film, ambil review untuk menghitung rating yang benar
+      const filmsWithReviews = await Promise.all(films.map(async (film) => {
+        try {
+          const reviewsResponse = await axios.get(`https://red-archive-kelompok-15.vercel.app/review/getByFilmId/${film.id}`);
+          if (reviewsResponse.data.success) {
+            const reviews = reviewsResponse.data.payload || [];
+            if (reviews.length > 0) {
+              const totalScore = reviews.reduce((sum, review) => sum + (review.rating || 0), 0);
+              const averageScore = (totalScore / reviews.length).toFixed(1);
+              return { ...film, rating: averageScore, reviews: reviews.length };
+            }
+          }
+          return { ...film, rating: '0.0', reviews: 0 };
+        } catch (error) {
+          console.warn(`Error fetching reviews for film ${film.id}:`, error);
+          return { ...film, rating: '0.0', reviews: 0 };
+        }
+      }));console.log('Films with reviews:', filmsWithReviews);
 
       // Get unique genres from all films
-      const genres = ['All', ...new Set(films.flatMap(film => film.genres))];
+      const genres = ['All', ...new Set(filmsWithReviews.flatMap(film => film.genres))];
       setAllGenres(genres);
 
-      let filteredFilms = films;
+      let filteredFilms = filmsWithReviews;
 
       if (searchQuery) {
         filteredFilms = films.filter(film => 
@@ -149,12 +164,13 @@ export default function Film() {
                         }}
                       />
                     </div>
-                    <div className="px-4 pb-4 text-white text-center">
+                    <div className="px-4 pb-4 text-white text-center">                      
                       <h3 className="text-xl font-bold mb-1">{film.title}</h3>
                       <p className="text-sm text-gray-300">{film.genres.join(', ')}</p>
-                      {film.rating && (
-                        <p className="text-sm text-yellow-400 mt-1">★ {film.rating}</p>
-                      )}
+                      <div className="flex items-center justify-center gap-2 mt-1">
+                        <p className="text-sm text-yellow-400">★ {film.rating}</p>
+                    
+                      </div>
                     </div>
                   </Link>
                 ))}
